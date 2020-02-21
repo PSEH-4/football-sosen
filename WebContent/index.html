@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Football</title>
+<script src="js/jquery-3.4.1.min.js"></script>
+<link href="css/bootstrap.css" rel="stylesheet">
+
+<script type="text/javascript">
+	$(document).ready(
+			function() {
+
+				$.ajax({
+					url : 'http://localhost:8000/executeapi/',
+					type : 'get',
+					data : {
+						"method" : "getCountries",
+						"args" : "1"
+					},
+					success : function(response) {
+						console.log(response);
+						var obj = jQuery.parseJSON(response);
+
+						var len = obj.length;
+
+						$("#country").empty();
+						$('#result').empty();
+						for (var i = 0; i < len; i++) {
+							console.log(obj[i])
+							var id = obj[i]['country_id'];
+							var name = obj[i]['country_name'];
+
+							$("#country").append(
+									"<option value='"+id+"'>" + name
+											+ "</option>");
+
+						}
+					}
+				});
+
+				$("#country").click(
+						function() {
+							var countryid = $(this).val();
+
+							$.ajax({
+								url : 'http://localhost:8000/executeapi/',
+								type : 'get',
+								data : {
+									"method" : "getLeagues",
+									"args" : countryid
+								},
+								success : function(response) {
+									console.log(response);
+									var obj = jQuery.parseJSON(response);
+
+									var len = obj.length;
+
+									$("#league").empty();
+									$('#result').empty();
+									for (var i = 0; i < len; i++) {
+										console.log(obj[i])
+										var id = obj[i]['league_id'];
+										var name = obj[i]['league_name'];
+
+										$("#league").append(
+												"<option value='"+id+"'>"
+														+ name + "</option>");
+
+									}
+								}
+							});
+
+						});
+				
+				
+				
+				$("#league").click(
+						function() {
+							var countryid = $(this).val();
+
+							$.ajax({
+								url : 'http://localhost:8000/executeapi/',
+								type : 'get',
+								data : {
+									"method" : "getTeams",
+									"args" : countryid
+								},
+								success : function(response) {
+									console.log(response);
+									var obj = jQuery.parseJSON(response);
+
+									var len = obj.length;
+
+									$("#team").empty();
+									$('#result').empty();
+									for (var i = 0; i < len; i++) {
+										console.log(obj[i])
+										var id = obj[i]['team_key'];
+										var name = obj[i]['team_name'];
+
+										$("#team").append(
+												"<option value='"+id+"'>"
+														+ name + "</option>");
+
+									}
+								}
+							});
+
+						});
+				
+				
+				$("#team").click(
+						function() {
+							var teamid = $(this).val();
+							var leagueid = $('#league').val();
+
+							$.ajax({
+								url : 'http://localhost:8001/executeapi/',
+								type : 'get',
+								data : {
+									"method" : "getStatData",
+									"args" : leagueid+","+teamid
+								},
+								success : function(response) {
+									console.log(response);
+									var obj = jQuery.parseJSON(response);
+									
+									$('#result').empty();
+									
+									$("#result").append(
+											"<table>" + 
+											"<tr><td>Country Name:" + obj[0]['country_name'] + "</td></tr>" + 
+											"<tr><td>Position:" + obj[0]['overall_league_position'] + "</td></tr>" + 
+											"</table>");
+									
+									
+								}
+							});
+
+						});
+				
+				
+				
+			});
+</script>
+</head>
+<body>
+	<form>
+		<div class="form-group">
+			<label for="country">Select a country</label> <select
+				class="form-control" id="country">
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="league">Select a league</label> <select
+				class="form-control" id="league">
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="team">Select a team</label> <select class="form-control"
+				id="team">
+			</select>
+		</div>
+		
+		<div id="result">
+		</div>
+	</form>
+</body>
+</html>
